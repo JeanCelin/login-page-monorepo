@@ -4,11 +4,14 @@
   "description": "api for login page",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "node --watch server.mjs"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^5.2.1"
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "mysql2": "^3.16.0",
+    "sequelize": "^6.37.7"
   }
 }
