@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const bcrypt = require("bcrypt");
 
 async function register(req, res) {
   // Pegar senha e email cadastrado
@@ -21,9 +22,13 @@ async function register(req, res) {
       });
     }
     // Cria o usuário
+
+    const saltRounds = 10
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
     const user = await User.create({
       email,
-      password, 
+      password: hashedPassword
     });
 
     // Retorna o usuario
@@ -51,15 +56,41 @@ async function login(req, res) {
     return res.status(400).json({ message: "Email e senha são obrigatórios" });
   }
 
-  // Buscando o usuário correspondente
-  const user = await User.findOne({ where: { email } });
+  try {
+    const user = await User.findOne({ where: { email }});
+  // Caso não encontre o email
+    if(!user) {
+      return res.status(401).json({
+        message: "Email ou senha invalidos"
+      })
+    }
 
-  // Validando se o usuário existe
-  if (!user) {
-    return res.status(401).json({ message: "Usuário ou senha inválidos" });
+    // Comparar as senhas, sintaxe bcrypt
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    // Caso a senha comparada seja inválida
+    if(!passwordMatch ){
+      return res.status(401).json({
+         message: "Email ou senha inválidos",
+      })
+    }
+
+    // Caso a senha seja válida
+
+    return res.status(200).json({
+      message: "Login realizado com sucesso",
+      user: {
+        id: user.id,
+        email: user.email,
+      }
+    });
+  
+  } catch (err ){
+    return res.satus(500).json({
+      message: "Erro ao realizar login",
+      error: err.message,
+    })
   }
-
-  return res.status(200).json({ message: "Login realizado com sucesso" });
 }
 
 
