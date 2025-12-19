@@ -4,7 +4,7 @@
   "description": "api for login page",
   "main": "index.js",
   "scripts": {
-    "dev": "node --watch server.mjs"
+    "dev": "node --watch src/server.js"
   },
   "author": "",
   "license": "ISC",
